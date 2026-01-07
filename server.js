@@ -1,8 +1,21 @@
 const WebSocket = require('ws');
+const http = require('http');
+
 const port = process.env.PORT || 9999;
-const wss = new WebSocket.Server({ port: port });
+
+// Render/Heroku/Railway require an HTTP server to respond to health checks
+const server = http.createServer((req, res) => {
+    res.writeHead(200);
+    res.end("Tetris Server is Running");
+});
+
+const wss = new WebSocket.Server({ server });
 
 console.log(`Tetris WebSocket Server started on port ${port}`);
+
+server.listen(port, () => {
+    console.log(`HTTP Server listening on port ${port}`);
+});
 
 const clients = new Set();
 const rooms = new Map(); // roomId -> { name, password, width, height, player1, player2 }
